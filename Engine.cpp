@@ -143,19 +143,19 @@ bool Engine::pickATile(int *x, int *y, float maxRange)
 			for (int cy = 0; cy < map->height; cy++) {
 				if (map->isInFov(cx, cy)
 					&& (maxRange == 0 || player->getDistance(cx, cy) <= maxRange)) {
-					TCODColor col = TCODConsole::root->getCharBackground(cx, cy);
+					TCODColor col = TCODConsole::root->getCharBackground(cx - (player->x - screenWidth / 2), cy - (player->y - screenHeight / 2));
 					col = col * 1.2f;
-					TCODConsole::root->setCharBackground(cx, cy, col);
+					TCODConsole::root->setCharBackground(cx - (player->x - screenWidth / 2), cy - (player->y - screenHeight / 2), col);
 				}
 			}
 		}
 		TCODSystem::checkForEvent(TCOD_EVENT_KEY_PRESS | TCOD_EVENT_MOUSE, &lastKey, &mouse);
-		if (map->isInFov(mouse.cx, mouse.cy)
-			&& (maxRange == 0 || player->getDistance(mouse.cx, mouse.cy) <= maxRange)) {
+		if (map->isInFov(mouse.cx + (player->x - screenWidth / 2), mouse.cy + (player->y - screenHeight / 2))
+			&& (maxRange == 0 || player->getDistance(mouse.cx + (player->x - screenWidth / 2), mouse.cy + (player->y - screenHeight / 2)) <= maxRange)) {
 			TCODConsole::root->setCharBackground(mouse.cx, mouse.cy, TCODColor::white);
 			if (mouse.lbutton_pressed) {
-				*x = mouse.cx;
-				*y = mouse.cy;
+				*x = mouse.cx + (player->x - screenWidth / 2);
+				*y = mouse.cy + (player->y - screenHeight / 2);
 				return true;
 			}
 		}

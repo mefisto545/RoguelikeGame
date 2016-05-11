@@ -119,7 +119,7 @@ void PlayerAi::update(Actor *owner)
 		engine.gui->menu.clear();
 		engine.gui->menu.addItem(Menu::CONSTITUTION, "Òåëîñëîæåíèå (+20 Åä.çä)");
 		engine.gui->menu.addItem(Menu::STRENGTH, "Ñèëà (+1 óğîí)");
-		engine.gui->menu.addItem(Menu::AGILITY, "Agility (+1 çàùèòà)");
+		engine.gui->menu.addItem(Menu::AGILITY, "Òîëñòîêîæåñòü (+1 çàùèòà)");
 		Menu::MenuItemCode menuItem = engine.gui->menu.pick(Menu::PAUSE);
 		switch (menuItem)
 		{
@@ -243,6 +243,15 @@ void PlayerAi::handleActionKey(Actor *owner, int ascii)
 			engine.gui->message(TCODColor::lightGrey, "Çäåñü íåò ëåñòíèöû");
 		}
 		break;
+	case 'd':
+	{
+				  Actor *actor = choseFromInventory(owner);
+				  if (actor) {
+					  actor->pickable->drop(actor, owner);
+					  engine.gameStatus = Engine::NEW_TURN;
+				  }
+	}
+		break;
 	default: break;
 	}
 }
@@ -306,7 +315,54 @@ Ai *Ai::create(TCODZip &zip) {
 	switch (type) {
 	case PLAYER: ai = new PlayerAi(); break;
 	case MONSTER: ai = new MonsterAi(); break;
+	case CONFUSED_MONSTER: ai = new ConfusedMonsterAi(0, NULL); break;
 	}
 	ai->load(zip);
 	return ai;
+}
+
+ConfusedMonsterAi::ConfusedMonsterAi(int nbTurns, Ai *oldAi) : nbTurns(nbTurns), oldAi(oldAi) {}
+
+void ConfusedMonsterAi::update(Actor *owner)
+{
+	TCODRandom *rng = TCODRandom::getInstance();
+	int dx = rng->getInt(-1, 1);
+	int dy = rng->getInt(-1, 1);
+	if (dx != 0 || dy != 0) 
+	{
+		int destx = owner->x + 2*dx;
+		int desty = owner->y + 2*dy;
+		if (engine.map->canWalk(destx, desty)) 
+		{
+			owner->x = destx;
+			owner->y = desty;
+		}
+		else 
+		{
+			Actor *actor = engine.getActor(destx, desty);
+			if (actor) 
+			{
+				owner->attacker->attack(owner, actor);
+			}
+		}
+	}
+	nbTurns--;
+	if (nbTurns == 0) 
+	{
+		owner->ai = oldAi;
+		delete this;
+	}
+}
+
+void ConfusedMonsterAi::load(TCODZip &zip)
+{
+	nbTurns = zip.getInt();
+	oldAi = Ai::create(zip);
+}
+
+void ConfusedMonsterAi::save(TCODZip &zip) 
+{
+	zip.putInt(CONFUSED_MONSTER);
+	zip.putInt(nbTurns);
+	oldAi->save(zip);
 }

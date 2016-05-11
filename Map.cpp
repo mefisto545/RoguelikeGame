@@ -240,8 +240,8 @@ void Map::addMonster(int x, int y)
 	if (rng->getInt(0, 100) < 80)
 	{
 		// create an orc
-		Actor *orc = new Actor(x, y, 3858, "Çëîáíûé îðê");
-		orc->destructible = new MonsterDestructible(10, 0, "Ìåðòâûé îðê", 15);
+		Actor *orc = new Actor(x, y, 3858, "Злобный орк");
+		orc->destructible = new MonsterDestructible(10, 0, "Мёртвый орк", 15);
 		orc->attacker = new Attacker(3);
 		orc->ai = new MonsterAi();
 		engine.actors.push(orc);
@@ -249,20 +249,46 @@ void Map::addMonster(int x, int y)
 	else 
 	{
 		// create a troll
-		Actor *troll = new Actor(x, y, 3866, "Òîëñòûé òðîëëü");
-		troll->destructible = new MonsterDestructible(16, 1, "Îñòàíêè òðîëëÿ", 25);
+		Actor *troll = new Actor(x, y, 3866, "Толстый тролль");
+		troll->destructible = new MonsterDestructible(16, 1, "Мёртвый тролль", 25);
 		troll->attacker = new Attacker(4);
 		troll->ai = new MonsterAi();
 		engine.actors.push(troll);
 	}
 }
 
-void Map::addItem(int x, int y)
-{
-	Actor *healthPotion = new Actor(x, y, 3862, "Çåëüå èñöåëåíèÿ");
-	healthPotion->blocks = false;
-	healthPotion->pickable = new Healer(4);
-	engine.actors.push(healthPotion);
+void Map::addItem(int x, int y) {
+	TCODRandom *rng = TCODRandom::getInstance();
+	int dice = rng->getInt(0, 100);
+	if (dice < 70) {
+		// create a health potion
+		Actor *healthPotion = new Actor(x, y, 3862, "Зелье здоровья");
+		healthPotion->blocks = false;
+		healthPotion->pickable = new Healer(4);
+		engine.actors.push(healthPotion);
+	}
+	else if (dice < 70 + 10) {
+		// create a scroll of lightning bolt 
+		Actor *scrollOfLightningBolt = new Actor(x, y, 3870, "Заклинание молнии");
+		scrollOfLightningBolt->blocks = false;
+		scrollOfLightningBolt->pickable = new LightningBolt(10, 20);
+		engine.actors.push(scrollOfLightningBolt);
+	}
+	else if (dice < 70 + 10 + 10) {
+		// create a scroll of fireball
+		Actor *scrollOfFireball = new Actor(x, y, 3870, "Заклинание файрбола");
+		scrollOfFireball->blocks = false;
+		scrollOfFireball->pickable = new FireBall(6, 12);
+		engine.actors.push(scrollOfFireball);
+	}
+	else
+	{
+		// create a scroll of confusion
+		Actor *scrollOfConfusion = new Actor(x, y, 3870, "Заклинание обескураживания");
+		scrollOfConfusion->blocks = false;
+		scrollOfConfusion->pickable = new Confuser(10, 8);
+		engine.actors.push(scrollOfConfusion);
+	}
 }
 
 void Map::save(TCODZip &zip) {

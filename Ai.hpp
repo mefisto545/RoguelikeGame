@@ -6,7 +6,7 @@ public:
 protected:
 	enum AiType
 	{
-		MONSTER, PLAYER
+		MONSTER, PLAYER, CONFUSED_MONSTER
 	};
 };
 
@@ -35,4 +35,16 @@ protected:
 	bool moveOrAttack(Actor *owner, int targetx, int targety);
 	void handleActionKey(Actor *owner, int ascii);
 	Actor *choseFromInventory(Actor *owner);
+};
+
+class ConfusedMonsterAi : public Ai
+{
+public:
+	ConfusedMonsterAi(int nbTurns, Ai *oldAi);
+	void update(Actor *owner);
+	void load(TCODZip &zip);
+	void save(TCODZip &zip);
+protected:
+	int nbTurns;
+	Ai *oldAi;
 };
