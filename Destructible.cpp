@@ -71,30 +71,6 @@ void PlayerDestructible::die(Actor *owner)
 	engine.gameStatus = Engine::DEFEAT;
 }
 
-void Destructible::load(TCODZip &zip) {
-	maxHp = zip.getFloat();
-	hp = zip.getFloat();
-	defense = zip.getFloat();
-	corpseName = _strdup(zip.getString());
-}
-
-void Destructible::save(TCODZip &zip) {
-	zip.putFloat(maxHp);
-	zip.putFloat(hp);
-	zip.putFloat(defense);
-	zip.putString(corpseName);
-}
-
-void PlayerDestructible::save(TCODZip &zip) {
-	zip.putInt(PLAYER);
-	Destructible::save(zip);
-}
-
-void MonsterDestructible::save(TCODZip &zip) {
-	zip.putInt(MONSTER);
-	Destructible::save(zip);
-}
-
 Destructible *Destructible::create(TCODZip &zip)
 {
 	DestructibleType type = (DestructibleType)zip.getInt();

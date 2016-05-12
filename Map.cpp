@@ -52,10 +52,10 @@ Map::Map(int width, int height)	: width(width), height(height)
 
 void Map::init(bool withActors) 
 {
-		rng = new TCODRandom(seed, TCOD_RNG_CMWC);
+	rng = new TCODRandom(seed, TCOD_RNG_CMWC);
 	tiles = new Tile[(width + 2)*(height + 2)];
 	map = new TCODMap(width + 2, height + 2);
-	TCODBsp bsp(1, 1, width, height);
+	TCODBsp bsp(2, 2, width, height);
 	bsp.splitRecursive(rng, 8, ROOM_MAX_SIZE, ROOM_MAX_SIZE, 1.5f, 1.5f);
 	BspListener listener(*this);
 	bsp.traverseInvertedLevelOrder(&listener, (void *)withActors);
@@ -120,6 +120,11 @@ void Map::createRoom(bool first, int x1, int y1, int x2, int y2, bool withActors
 		// put the player in the first room
 		engine.player->x = (x1 + x2) / 2 - ((x1 + x2) / 2) % 2;
 		engine.player->y = (y1 + y2) / 2 - ((y1 + y2) / 2) % 2;
+		if (engine.level == 1)
+		{
+			engine.scroll->x = (x1 + x2) / 2 - ((x1 + x2) / 2) % 2 + 2;
+			engine.scroll->y = (y1 + y2) / 2 - ((y1 + y2) / 2) % 2;
+		}
 	}
 	else
 	{
@@ -132,7 +137,7 @@ void Map::createRoom(bool first, int x1, int y1, int x2, int y2, bool withActors
 			int y = rng->getInt(y1, y2);
 			x -= x % 2;
 			y -= y % 2;
-			if (canWalk(x, y) && canWalk(x + 1, y - 1) && canWalk(x + 1, y) && canWalk(x, y - 1) && x < width - 2)
+			if (canWalk(x, y) && canWalk(x + 1, y - 1) && canWalk(x + 1, y) && canWalk(x, y - 1) && x < width - 3 && y < height - 3)
 			{
 				addItem(x, y);
 			}
@@ -146,7 +151,7 @@ void Map::createRoom(bool first, int x1, int y1, int x2, int y2, bool withActors
 			int y = rng->getInt(y1, y2);
 			x -= x % 2;
 			y -= y % 2;
-			if (canWalk(x, y) && canWalk(x + 1, y - 1) && canWalk(x + 1, y) && canWalk(x, y - 1) && x < width - 2)
+			if (canWalk(x, y) && canWalk(x + 1, y - 1) && canWalk(x + 1, y) && canWalk(x, y - 1) && x < width - 3 && y < height - 3)
 			{
 				addMonster(x, y);
 			}
@@ -237,71 +242,231 @@ void Map::addMonster(int x, int y)
 	x -= x % 2;
 	y -= y % 2;
 	TCODRandom *rng = TCODRandom::getInstance();
-	if (rng->getInt(0, 100) < 80)
-	{
-		// create an orc
-		Actor *orc = new Actor(x, y, 3858, "Р—Р»РѕР±РЅС‹Р№ РѕСЂРє");
-		orc->destructible = new MonsterDestructible(10, 0, "РњС‘СЂС‚РІС‹Р№ РѕСЂРє", 15);
-		orc->attacker = new Attacker(3);
-		orc->ai = new MonsterAi();
-		engine.actors.push(orc);
-	}
-	else 
-	{
-		// create a troll
-		Actor *troll = new Actor(x, y, 3866, "РўРѕР»СЃС‚С‹Р№ С‚СЂРѕР»Р»СЊ");
-		troll->destructible = new MonsterDestructible(16, 1, "РњС‘СЂС‚РІС‹Р№ С‚СЂРѕР»Р»СЊ", 25);
-		troll->attacker = new Attacker(4);
-		troll->ai = new MonsterAi();
-		engine.actors.push(troll);
+	switch (engine.level) {
+	case 1:
+		if (rng->getInt(0, 100) < 75) {
+			// create an monster
+			Actor *orc = new Actor(x, y, 3860, "Крыса");
+			orc->destructible = new MonsterDestructible(5, 0, "Останки крысы", 30);
+			orc->attacker = new Attacker(1);
+			orc->ai = new MonsterAi();
+			engine.actors.push(orc);
+		}
+		else
+		{
+			// create another monster
+			Actor *troll = new Actor(x, y, 3894, "Вор");
+			troll->destructible = new MonsterDestructible(10, 0, "Труп", 40);
+			troll->attacker = new Attacker(2);
+			troll->ai = new MonsterAi();
+			engine.actors.push(troll);
+		}
+		break;
+	case 2:
+		if (rng->getInt(0, 100) < 60) {
+			// create an monster
+			Actor *orc = new Actor(x, y, 3892, "Разбойник");
+			orc->destructible = new MonsterDestructible(10, 2, "Изуродованное тело", 50);
+			orc->attacker = new Attacker(3);
+			orc->ai = new MonsterAi();
+			engine.actors.push(orc);
+		}
+		else
+		{
+			// create another monster
+			Actor *troll = new Actor(x, y, 0, "Сектант");
+			troll->destructible = new MonsterDestructible(10, 0, "Останки сектанта", 40);
+			troll->attacker = new Attacker(5);
+			troll->ai = new MonsterAi();
+			engine.actors.push(troll);
+		}
+		break;
+	case 3:
+		if (rng->getInt(0, 100) < 80) {
+			// create an monster
+			Actor *orc = new Actor(x, y, 3858, "Злобный орк");
+			orc->destructible = new MonsterDestructible(10, 0, "труп орка", 40);
+			orc->attacker = new Attacker(3);
+			orc->ai = new MonsterAi();
+			engine.actors.push(orc);
+		}
+		else
+		{
+			// create another monster
+			Actor *troll = new Actor(x, y, 3866, "Толстый тролль");
+			troll->destructible = new MonsterDestructible(30, 0, "останки тролля", 60);
+			troll->attacker = new Attacker(5);
+			troll->ai = new MonsterAi();
+			engine.actors.push(troll);
+		}
+		break;
+	case 4:
+		if (rng->getInt(0, 100) < 80) {
+			// create an monster
+			Actor *orc = new Actor(x, y, 3890, "Зомби");
+			orc->destructible = new MonsterDestructible(20, 1, "Павший зомби", 55);
+			orc->attacker = new Attacker(5);
+			orc->ai = new MonsterAi();
+			engine.actors.push(orc);
+		}
+		else
+		{
+			// create another monster
+			Actor *troll = new Actor(x, y, 3866, "Гигантский паук");//
+			troll->destructible = new MonsterDestructible(50, 0, "Гигантский труп", 100);
+			troll->attacker = new Attacker(4);
+			troll->ai = new MonsterAi();
+			engine.actors.push(troll);
+		}
+		break;
+	case 5:
+		if (rng->getInt(0, 100) < 50) {
+			// create an monster
+			Actor *orc = new Actor(x, y, 3888, "Скелет");//
+			orc->destructible = new MonsterDestructible(10, 0, "косточки", 60);
+			orc->attacker = new Attacker(6);
+			orc->ai = new MonsterAi();
+			engine.actors.push(orc);
+		}
+		else
+		{
+			// create another monster
+			Actor *troll = new Actor(x, y, 3866, "Прислужник нежити");//
+			troll->destructible = new MonsterDestructible(20, 1, "труп прислужника", 70);
+			troll->attacker = new Attacker(4);
+			troll->ai = new MonsterAi();
+			engine.actors.push(troll);
+		}
+		break;
+	case 6:
+		if (rng->getInt(0, 100) < 50) {
+			// create an monster
+			Actor *orc = new Actor(x, y, 3864, "Скелет-боец");
+			orc->destructible = new MonsterDestructible(15, 5, "косточки", 100);
+			orc->attacker = new Attacker(10);
+			orc->ai = new MonsterAi();
+			engine.actors.push(orc);
+		}
+		else
+		{
+			// create another monster
+			Actor *troll = new Actor(x, y, 3866, "Нежить");//
+			troll->destructible = new MonsterDestructible(60, 0, "мерзость", 120);
+			troll->attacker = new Attacker(6);
+			troll->ai = new MonsterAi();
+			engine.actors.push(troll);
+		}
+		break;
+	case 7:
+		if (rng->getInt(0, 100) < 20) {
+			// create an monster
+			Actor *orc = new Actor(x, y, 3858, "Продвинутая нежить");//
+			orc->destructible = new MonsterDestructible(90, 1, "почетный труп", 150);
+			orc->attacker = new Attacker(8);
+			orc->ai = new MonsterAi();
+			engine.actors.push(orc);
+		}
+		else
+		{
+			// create another monster
+			Actor *troll = new Actor(x, y, 3866, "Голем");//
+			troll->destructible = new MonsterDestructible(30, 5, "обломки голема", 30);
+			troll->attacker = new Attacker(3);
+			troll->ai = new MonsterAi();
+			engine.actors.push(troll);
+		}
+		break;
+	case 8:
+		if (rng->getInt(0, 100) < 50) {
+			// create an monster
+			Actor *orc = new Actor(x, y, 3858, "Черт");//
+			orc->destructible = new MonsterDestructible(15, 0, "труп", 50);
+			orc->attacker = new Attacker(6);
+			orc->ai = new MonsterAi();
+			engine.actors.push(orc);
+		}
+		else
+		{
+			// create another monster
+			Actor *troll = new Actor(x, y, 3866, "Цербер");//
+			troll->destructible = new MonsterDestructible(32, 5, "собачатина", 200);
+			troll->attacker = new Attacker(12);
+			troll->ai = new MonsterAi();
+			engine.actors.push(troll);
+		}
+		break;
+	case 9:
+		if (rng->getInt(0, 100) < 85) {
+			// create an monster
+			Actor *orc = new Actor(x, y, 3858, "адский гвардеец");//
+			orc->destructible = new MonsterDestructible(150, 10, "почетные останки", 400);
+			orc->attacker = new Attacker(20);
+			orc->ai = new MonsterAi();
+			engine.actors.push(orc);
+		}
+		else
+		{
+			// create another monster
+			Actor *troll = new Actor(x, y, 3866, "Злобоглаз");//
+			troll->destructible = new MonsterDestructible(50, 0, "собачатина", 100);
+			troll->attacker = new Attacker(8);
+			troll->ai = new MonsterAi();
+			engine.actors.push(troll);
+		}
+		break;
+	default:
+		if (rng->getInt(0, 100) < 85) {
+			// create an monster
+			Actor *orc = new Actor(x, y, 3858, "адский гвардеец");//
+			orc->destructible = new MonsterDestructible(150, 10, "почетные останки", 400);
+			orc->attacker = new Attacker(20);
+			orc->ai = new MonsterAi();
+			engine.actors.push(orc);
+		}
+		else
+		{
+			// create another monster
+			Actor *troll = new Actor(x, y, 3866, "Злобоглаз");//
+			troll->destructible = new MonsterDestructible(50, 0, "Останки", 100);
+			troll->attacker = new Attacker(8);
+			troll->ai = new MonsterAi();
+			engine.actors.push(troll);
+		}
+		break;
 	}
 }
 
-void Map::addItem(int x, int y) {
+void Map::addItem(int x, int y)
+{
 	TCODRandom *rng = TCODRandom::getInstance();
 	int dice = rng->getInt(0, 100);
 	if (dice < 70) {
-		// create a health potion
-		Actor *healthPotion = new Actor(x, y, 3862, "Р—РµР»СЊРµ Р·РґРѕСЂРѕРІСЊСЏ");
+				// create a health potion
+			Actor *healthPotion = new Actor(x, y, 3862, "Зелье здоровья");
 		healthPotion->blocks = false;
 		healthPotion->pickable = new Healer(4);
 		engine.actors.push(healthPotion);
 	}
 	else if (dice < 70 + 10) {
-		// create a scroll of lightning bolt 
-		Actor *scrollOfLightningBolt = new Actor(x, y, 3870, "Р—Р°РєР»РёРЅР°РЅРёРµ РјРѕР»РЅРёРё");
+				// create a scroll of lightning bolt 
+			Actor *scrollOfLightningBolt = new Actor(x, y, 3870, "'Молния'");
 		scrollOfLightningBolt->blocks = false;
 		scrollOfLightningBolt->pickable = new LightningBolt(10, 20);
 		engine.actors.push(scrollOfLightningBolt);
 	}
 	else if (dice < 70 + 10 + 10) {
-		// create a scroll of fireball
-		Actor *scrollOfFireball = new Actor(x, y, 3870, "Р—Р°РєР»РёРЅР°РЅРёРµ С„Р°Р№СЂР±РѕР»Р°");
+				// create a scroll of fireball
+			Actor *scrollOfFireball = new Actor(x, y, 3870, "'Огненный шар'");
 		scrollOfFireball->blocks = false;
 		scrollOfFireball->pickable = new FireBall(6, 12);
 		engine.actors.push(scrollOfFireball);
 	}
 	else
-	{
-		// create a scroll of confusion
-		Actor *scrollOfConfusion = new Actor(x, y, 3870, "Р—Р°РєР»РёРЅР°РЅРёРµ РѕР±РµСЃРєСѓСЂР°Р¶РёРІР°РЅРёСЏ");
+		 {
+				// create a scroll of confusion
+		Actor *scrollOfConfusion = new Actor(x, y, 3870, "'Обескураживание'");
 		scrollOfConfusion->blocks = false;
 		scrollOfConfusion->pickable = new Confuser(10, 8);
 		engine.actors.push(scrollOfConfusion);
-	}
-}
-
-void Map::save(TCODZip &zip) {
-	zip.putInt(seed);
-	for (int i = 0; i < width*height; i++) {
-		zip.putInt(tiles[i].explored);
-	}
-}
-
-void Map::load(TCODZip &zip) {
-	seed = zip.getInt();
-	init(false);
-	for (int i = 0; i < width*height; i++) {
-		tiles[i].explored = zip.getInt();
-	}
+		}
 }

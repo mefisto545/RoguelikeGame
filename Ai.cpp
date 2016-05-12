@@ -119,7 +119,7 @@ void PlayerAi::update(Actor *owner)
 		engine.gui->menu.clear();
 		engine.gui->menu.addItem(Menu::CONSTITUTION, "Телосложение (+20 Ед.зд)");
 		engine.gui->menu.addItem(Menu::STRENGTH, "Сила (+1 урон)");
-		engine.gui->menu.addItem(Menu::AGILITY, "Толстокожесть (+1 защита)");
+		engine.gui->menu.addItem(Menu::AGILITY, "Agility (+1 защита)");
 		Menu::MenuItemCode menuItem = engine.gui->menu.pick(Menu::PAUSE);
 		switch (menuItem)
 		{
@@ -193,6 +193,17 @@ void PlayerAi::handleActionKey(Actor *owner, int ascii)
 {
 	switch (ascii)
 	{
+		case 'd':
+			{
+				Actor *actor = choseFromInventory(owner);
+				if (actor)
+				{
+					actor->pickable->drop(actor, owner);
+					engine.gameStatus = Engine::NEW_TURN;
+					
+				}
+				}
+			break;
 	case 'g': // pickup item
 	{
 		bool found = false;
@@ -238,19 +249,28 @@ void PlayerAi::handleActionKey(Actor *owner, int ascii)
 		{
 			engine.nextLevel();
 		}
-		else 
+		else if (engine.scroll->x == owner->x && engine.scroll->y == owner->y)
 		{
-			engine.gui->message(TCODColor::lightGrey, "Здесь нет лестницы");
+			const int INVENTORY_WIDTH = 50;
+			const int INVENTORY_HEIGHT = 28;
+			TCOD_key_t key;
+			TCODConsole con(INVENTORY_WIDTH, INVENTORY_HEIGHT);
+			con.setDefaultForeground(TCODColor(200, 180, 50));
+			con.printFramenew(0, 0, INVENTORY_WIDTH, INVENTORY_HEIGHT, true, TCOD_BKGND_DEFAULT, "Письмо");
+			if (engine.level == 1)
+				con.print(3, 3, "Из записок капитана стражи:\n...на днях лазутчики доложили,\n что в этом древнем подземелье\n были обнаружены	загадочные \nсущества...");
+			else
+				con.print(3, 3, "Проклятье! Я не смогу их долго сдерживать.\nЕсли бы я мог добраться до кристалла\n и закрыть Врата! Но <DemonName> слишком\n силён для меня, а остальные члены экспедиции погибли,\nлибо лишились рассудка под влиянием\n демонов... ");
+			TCODConsole::blit(&con, 0, 0, INVENTORY_WIDTH, INVENTORY_HEIGHT, TCODConsole::root, engine.screenWidth / 2 - INVENTORY_WIDTH / 2,
+				engine.screenHeight / 2 - INVENTORY_HEIGHT / 2);
+			TCODConsole::flush();
+			TCODSystem::waitForEvent(TCOD_EVENT_KEY_PRESS, &key, NULL, true);
+			con.root->setDefaultForeground(TCODColor::white);
 		}
-		break;
-	case 'd':
-	{
-				  Actor *actor = choseFromInventory(owner);
-				  if (actor) {
-					  actor->pickable->drop(actor, owner);
-					  engine.gameStatus = Engine::NEW_TURN;
-				  }
-	}
+		else
+		{
+			engine.gui->message(TCODColor::lightGrey, "Здесь нечего использовать");
+		}
 		break;
 	default: break;
 	}
@@ -293,22 +313,6 @@ Actor *PlayerAi::choseFromInventory(Actor *owner)
 	return NULL;
 }
 
-void MonsterAi::load(TCODZip &zip) {
-	moveCount = zip.getInt();
-}
-
-void MonsterAi::save(TCODZip &zip) {
-	zip.putInt(MONSTER);
-	zip.putInt(moveCount);
-}
-
-void PlayerAi::load(TCODZip &zip) {
-}
-
-void PlayerAi::save(TCODZip &zip) {
-	zip.putInt(PLAYER);
-}
-
 Ai *Ai::create(TCODZip &zip) {
 	AiType type = (AiType)zip.getInt();
 	Ai *ai = NULL;
@@ -324,45 +328,32 @@ Ai *Ai::create(TCODZip &zip) {
 ConfusedMonsterAi::ConfusedMonsterAi(int nbTurns, Ai *oldAi) : nbTurns(nbTurns), oldAi(oldAi) {}
 
 void ConfusedMonsterAi::update(Actor *owner)
-{
+ {
 	TCODRandom *rng = TCODRandom::getInstance();
 	int dx = rng->getInt(-1, 1);
 	int dy = rng->getInt(-1, 1);
-	if (dx != 0 || dy != 0) 
-	{
-		int destx = owner->x + 2*dx;
-		int desty = owner->y + 2*dy;
-		if (engine.map->canWalk(destx, desty)) 
-		{
+	if (dx != 0 || dy != 0)
+		 {
+		int destx = owner->x + 2 * dx;
+		int desty = owner->y + 2 * dy;
+		if (engine.map->canWalk(destx, desty))
+			 {
 			owner->x = destx;
 			owner->y = desty;
-		}
-		else 
-		{
+			}
+		else
+			 {
 			Actor *actor = engine.getActor(destx, desty);
-			if (actor) 
-			{
+			if (actor)
+				{
 				owner->attacker->attack(owner, actor);
+				}
 			}
 		}
-	}
 	nbTurns--;
-	if (nbTurns == 0) 
-	{
+	if (nbTurns == 0)
+		 {
 		owner->ai = oldAi;
 		delete this;
+		}
 	}
-}
-
-void ConfusedMonsterAi::load(TCODZip &zip)
-{
-	nbTurns = zip.getInt();
-	oldAi = Ai::create(zip);
-}
-
-void ConfusedMonsterAi::save(TCODZip &zip) 
-{
-	zip.putInt(CONFUSED_MONSTER);
-	zip.putInt(nbTurns);
-	oldAi->save(zip);
-}

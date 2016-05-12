@@ -8,6 +8,7 @@ public:
 		NONE,
 		NEW_GAME,
 		CONTINUE,
+		OPTIONS,
 		EXIT,
 		CONSTITUTION,
 		STRENGTH,

@@ -1,4 +1,4 @@
-#include "main.hpp"
+ï»¿#include "main.hpp"
 
 bool Pickable::pick(Actor *owner, Actor *wearer) 
 {
@@ -36,23 +36,16 @@ bool Healer::use(Actor *owner, Actor *wearer)
 	return false;
 }
 
-void Healer::load(TCODZip &zip) {
-	amount = zip.getFloat();
-}
-
-void Healer::save(TCODZip &zip) {
-	zip.putInt(HEALER);
-	zip.putFloat(amount);
-}
-
-Pickable *Pickable::create(TCODZip &zip) {
+Pickable *Pickable::create(TCODZip &zip) 
+{
 	PickableType type = (PickableType)zip.getInt();
 	Pickable *pickable = NULL;
-	switch (type) {
-		case HEALER: pickable = new Healer(0); break;
-		case LIGHTNING_BOLT: pickable = new LightningBolt(0, 0); break;
-		case FIREBALL: pickable = new FireBall(0,0); break;
-		case CONFUSER: pickable = new Confuser(0, 0); break;
+	switch (type) 
+	{
+	case HEALER: pickable = new Healer(0); break;
+	case LIGHTNING_BOLT: pickable = new LightningBolt(0, 0); break;
+	case FIREBALL: pickable = new FireBall(0, 0); break;
+	case CONFUSER: pickable = new Confuser(0, 0); break;
 	}
 	pickable->load(zip);
 	return pickable;
@@ -63,45 +56,32 @@ LightningBolt::LightningBolt(float range, float damage) : range(range), damage(d
 bool LightningBolt::use(Actor *owner, Actor *wearer) {
 	Actor *closestMonster = engine.getClosestMonster(wearer->x, wearer->y, range);
 	if (!closestMonster) {
-		engine.gui->message(TCODColor::lightGrey, "Íåò íèêîãî äîñòàòî÷íî áëèçêî äëÿ óäàðà.");
+		engine.gui->message(TCODColor::lightGrey, "ÐÐµÑ‚ Ð½Ð¸ÐºÐ¾Ð³Ð¾ Ð´Ð¾ÑÑ‚Ð°Ñ‚Ð¾Ñ‡Ð½Ð¾ Ð±Ð»Ð¸Ð·ÐºÐ¾ Ð´Ð»Ñ ÑƒÐ´Ð°Ñ€Ð°.");
 		return false;
 	}
 	engine.gui->message(TCODColor::lightBlue,
-		"%s óäàðåí ìîëíèåé!\n"
-		"Íàíåñåíî %g óðîíà.",
+		"%s ÑƒÐ´Ð°Ñ€ÐµÐ½ Ð¼Ð¾Ð»Ð½Ð¸ÐµÐ¹!\n"
+		"ÐÐ°Ð½ÐµÑÐµÐ½Ð¾ %g ÑƒÑ€Ð¾Ð½Ð°.",
 		closestMonster->name, damage);
 	closestMonster->destructible->takeDamage(closestMonster, damage);
 	return Pickable::use(owner, wearer);
 }
 
-void LightningBolt::load(TCODZip &zip)
-{
-	range = zip.getFloat();
-	damage = zip.getFloat();
-}
-
-void LightningBolt::save(TCODZip &zip)
-{
-	zip.putInt(LIGHTNING_BOLT);
-	zip.putFloat(range);
-	zip.putFloat(damage);
-}
-
 FireBall::FireBall(float range, float damage) : range(range), damage(damage) {}
 
 bool FireBall::use(Actor *owner, Actor *wearer) {
-	engine.gui->message(TCODColor::cyan, "ËÊÌ äëÿ âûáîðà öåíòðà ôàéðáîëà,\nèëè ÏÊÌ äëÿ îòìåíû.");
+	engine.gui->message(TCODColor::cyan, "Ð›ÐšÐœ Ð´Ð»Ñ Ð²Ñ‹Ð±Ð¾Ñ€Ð° Ñ†ÐµÐ½Ñ‚Ñ€Ð° Ð¾Ð³Ð½ÐµÐ½Ð½Ð¾Ð³Ð¾ ÑˆÐ°Ñ€Ð°,\nÐ¸Ð»Ð¸ ÐŸÐšÐœ Ð´Ð»Ñ Ð¾Ñ‚Ð¼ÐµÐ½Ñ‹.");
 	int x, y;
 	if (!engine.pickATile(&x, &y, 0)) {
 		return false;
 	}
-	engine.gui->message(TCODColor::orange, "Ôàéðáîë âçðûâàåòñÿ è ñæèãàåò âñ¸ â ðàäèóñå %g êëåòîê!", range/2);
+	engine.gui->message(TCODColor::orange, "ÐžÐ³Ð½ÐµÐ½Ð½Ñ‹Ð¹ ÑˆÐ°Ñ€ Ð²Ð·Ñ€Ñ‹Ð²Ð°ÐµÑ‚ÑÑ Ð¸ ÑÐ¶Ð¸Ð³Ð°ÐµÑ‚ Ð²ÑÑ‘ Ð² Ñ€Ð°Ð´Ð¸ÑƒÑÐµ %g ÐºÐ»ÐµÑ‚Ð¾Ðº!", range / 2);
 	for (Actor **iterator = engine.actors.begin();
 		iterator != engine.actors.end(); iterator++) {
 		Actor *actor = *iterator;
 		if (actor->destructible && !actor->destructible->isDead()
 			&& actor->getDistance(x, y) <= range) {
-			engine.gui->message(TCODColor::orange, "%s ãîðèò è ïîëó÷àåò %g î÷êîâ óðîíà.",
+			engine.gui->message(TCODColor::orange, "%s Ð³Ð¾Ñ€Ð¸Ñ‚ Ð¸ Ð¿Ð¾Ð»ÑƒÑ‡Ð°ÐµÑ‚ %g Ð¾Ñ‡ÐºÐ¾Ð² ÑƒÑ€Ð¾Ð½Ð°.",
 				actor->name, damage);
 			actor->destructible->takeDamage(actor, damage);
 		}
@@ -109,58 +89,33 @@ bool FireBall::use(Actor *owner, Actor *wearer) {
 	return Pickable::use(owner, wearer);
 }
 
-void FireBall::load(TCODZip &zip)
-{
-	range = zip.getFloat();
-	damage = zip.getFloat();
-}
-
-void FireBall::save(TCODZip &zip)
-{
-	zip.putInt(FIREBALL);
-	zip.putFloat(range);
-	zip.putFloat(damage);
-}
-
 Confuser::Confuser(int nbTurns, float range) : nbTurns(nbTurns), range(range) {}
 
 bool Confuser::use(Actor *owner, Actor *wearer) {
-	engine.gui->message(TCODColor::cyan, "ËÊÌ äëÿ ñáèòèÿ ïðîòèâíèêà ñ òîëêó,\nÏÊÌ äëÿ îòìåíû.");
+	engine.gui->message(TCODColor::cyan, "Ð›ÐšÐœ Ð´Ð»Ñ ÑÐ±Ð¸Ñ‚Ð¸Ñ Ð¿Ñ€Ð¾Ñ‚Ð¸Ð²Ð½Ð¸ÐºÐ° Ñ Ñ‚Ð¾Ð»ÐºÑƒ,\nÐŸÐšÐœ Ð´Ð»Ñ Ð¾Ñ‚Ð¼ÐµÐ½Ñ‹.");
 	int x, y;
 	if (!engine.pickATile(&x, &y, range)) {
 		return false;
 	}
-	Actor *actor = engine.getActor((x/2)*2, (y/2)*2);
+	Actor *actor = engine.getActor((x / 2) * 2, (y / 2) * 2);
 	if (!actor) {
 		return false;
 	}
 	Ai *confusedAi = new ConfusedMonsterAi(nbTurns, actor->ai);
 	actor->ai = confusedAi;
-	engine.gui->message(TCODColor::lightGreen, "%s âûãëÿäèò ïîòåðÿííûì,\nè îí íà÷èíàåò áåñöåëüíî áðîäèòü!",
+	engine.gui->message(TCODColor::lightGreen, "%s Ð²Ñ‹Ð³Ð»ÑÐ´Ð¸Ñ‚ Ð¿Ð¾Ñ‚ÐµÑ€ÑÐ½Ð½Ñ‹Ð¼,\nÐ¸ Ð¾Ð½ Ð½Ð°Ñ‡Ð¸Ð½Ð°ÐµÑ‚ Ð±ÐµÑÑ†ÐµÐ»ÑŒÐ½Ð¾ Ð±Ñ€Ð¾Ð´Ð¸Ñ‚ÑŒ!",
 		actor->name);
 	return Pickable::use(owner, wearer);
 }
 
-void Confuser::load(TCODZip &zip)
+void Pickable::drop(Actor *owner, Actor *wearer)
 {
-	range = zip.getFloat();
-	nbTurns = zip.getInt();
-}
-
-void Confuser::save(TCODZip &zip)
-{
-	zip.putInt(CONFUSER);
-	zip.putFloat(range);
-	zip.putInt(nbTurns);
-}
-
-void Pickable::drop(Actor *owner, Actor *wearer) {
 	if (wearer->container) {
 		wearer->container->remove(owner);
 		engine.actors.push(owner);
 		owner->x = wearer->x;
 		owner->y = wearer->y;
-		engine.gui->message(TCODColor::lightGrey, "%s drops a %s.",
-			wearer->name, owner->name);
+		engine.gui->message(TCODColor::lightGrey, "%s Ð²Ñ‹Ð±Ñ€Ð°ÑÑ‹Ð²Ð°ÐµÑ‚ %s.",
+		wearer->name, owner->name);
 	}
 }

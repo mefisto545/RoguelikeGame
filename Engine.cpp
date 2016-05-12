@@ -5,7 +5,7 @@ Engine::Engine(int screenWidth, int screenHeight) : gameStatus(STARTUP), player(
 screenWidth(screenWidth), screenHeight(screenHeight), level(1)
 {
 	TCODConsole::setCustomFont("BigMainFont.png", TCOD_FONT_LAYOUT_ASCII_INROW | TCOD_FONT_TYPE_GREYSCALE, 16, 256);
-	TCODConsole::initRoot(screenWidth, screenHeight, "Test window", true);
+	TCODConsole::initRoot(screenWidth, screenHeight, "Test window", false);
 	TCODMouse::showCursor(true);
 	gui = new Gui();
 }
@@ -18,7 +18,11 @@ void Engine::init()
 	player->ai = new PlayerAi();
 	player->container = new Container(26);
 	actors.push(player);
-	stairs = new Actor(0, 0, 'H', "Лестница");//change the symbol
+	scroll = new Actor(0, 0, 3898, "Письмо");
+	scroll->blocks = false;
+	scroll->fovOnly = false;
+	engine.actors.push(scroll);
+	stairs = new Actor(0, 0, 3896, "Лестница");//change the symbol
 	stairs->blocks = false;
 	stairs->fovOnly = false;
 	actors.push(stairs);
@@ -89,7 +93,7 @@ void Engine::render()
 	player->render(-player->x + screenWidth / 2, -player->y + screenHeight / 2);
 	// show the player's stats
 	gui->render(player->x - screenWidth / 2, player->y - screenHeight / 2);
-	TCODConsole::root->print(0, screenHeight - 3, "mX=%d mY=%d", mouse.cx + player->x - screenWidth / 2, mouse.cy + player->y - screenHeight / 2);
+	TCODConsole::root->print(0, screenHeight - 3, "mX=%d mY=%d", mouse.cx, mouse.cy);
 }
 
 void Engine::sendToBack(Actor *actor)
@@ -133,7 +137,7 @@ Actor *Engine::getClosestMonster(int x, int y, float range) const
 	return closest;
 }
 
-bool Engine::pickATile(int *x, int *y, float maxRange) 
+bool Engine::pickATile(int *x, int *y, float maxRange)
 {
 	while (!TCODConsole::isWindowClosed())
 	{
@@ -170,19 +174,47 @@ bool Engine::pickATile(int *x, int *y, float maxRange)
 void Engine::nextLevel()
 {
 	level++;
-	gui->message(TCODColor::red, "Спускаясь всё глубже в позмелье, вы\nвы сильнее ощущаете приближение зла...");
+	gui->message(TCODColor::red, "Спускаясь всё глубже в позмелье,\nвы сильнее ощущаете приближение зла...");
 	delete map;
 	// delete all actors but player and stairs
 	for (Actor **it = actors.begin(); it != actors.end(); it++)
 	{
-		if (*it != player && *it != stairs) 
+		if (*it != player && *it != stairs && *it != scroll) 
 		{
 			delete *it;
 			it = actors.remove(it);
 		}
 	}
 	// create a new map
-	map = new Map(100, 100);
-	map->init(true);
-	gameStatus = STARTUP;
+	if (level != 2)
+	{
+		map = new Map(100, 100);
+		map->init(true);
+		gameStatus = STARTUP;
+	}
+	else
+	{
+		map = new Map(100, 160);
+		map->init(false);
+		for (int tilex = 0; tilex < 100; tilex++) //tile in the middle room
+			for (int tiley = 0; tiley < 160; tiley++)
+				map->map->setProperties(tilex, tiley, false, false);
+		map->dig(10, 8, 54, 8); //the highest space
+		map->dig(2, 6, 60, 24); // space with boss
+		map->dig(10, 24, 52, 48); // the middle room
+		map->dig(19, 48, 21, 50);// the corridor
+		map->dig(16, 50, 46, 60); //the last room
+		for (int tilex = 28; tilex <= 46; tilex += 2) //tile in the middle room
+		{
+			for (int tiley = 30; tiley <= 32; tiley += 2)
+			{
+				map->map->setProperties(tilex, tiley, false, false);
+				map->map->setProperties(tilex + 1, tiley, false, false);
+				map->map->setProperties(tilex, tiley - 1, false, false);
+				map->map->setProperties(tilex + 1, tiley - 1, false, false);
+			}
+		}
+		engine.scroll->x = player->x + 2;
+		engine.scroll->y = player->y + 2;
+	}
 }

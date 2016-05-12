@@ -146,24 +146,6 @@ void Gui::renderMouseLook(int cx, int cy)
 	con->print(1, 0, buf);
 }
 
-void Gui::save(TCODZip &zip) {
-	zip.putInt(log.size());
-	for (Message **it = log.begin(); it != log.end(); it++) {
-		zip.putString((*it)->text);
-		zip.putColor(&(*it)->col);
-	}
-}
-
-void Gui::load(TCODZip &zip) {
-	int nbMessages = zip.getInt();
-	while (nbMessages > 0) {
-		const char *text = zip.getString();
-		TCODColor col = zip.getColor();
-		message(col, text);
-		nbMessages--;
-	}
-}
-
 Menu::~Menu()
 {
 	clear();
@@ -195,6 +177,7 @@ void Menu::putBigPic()
 
 const int PAUSE_MENU_WIDTH = 30;
 const int PAUSE_MENU_HEIGHT = 15;
+
 Menu::MenuItemCode Menu::pick(DisplayMode mode)
 {
 	int selectedItem = 0;
@@ -204,7 +187,7 @@ Menu::MenuItemCode Menu::pick(DisplayMode mode)
 		menux = engine.screenWidth / 2 - PAUSE_MENU_WIDTH / 2;
 		menuy = engine.screenHeight / 2 - PAUSE_MENU_HEIGHT / 2;
 		TCODConsole::root->setDefaultForeground(TCODColor(200, 180, 50));
-		TCODConsole::root->printFrame(menux, menuy, PAUSE_MENU_WIDTH, PAUSE_MENU_HEIGHT, true, TCOD_BKGND_ALPHA(70), "Меню");
+		TCODConsole::root->printFramenew(menux, menuy, PAUSE_MENU_WIDTH, PAUSE_MENU_HEIGHT, true, TCOD_BKGND_ALPHA(70), "Новый уровень");
 		menux += 2;
 		menuy += 3;
 	}
@@ -223,7 +206,8 @@ Menu::MenuItemCode Menu::pick(DisplayMode mode)
 			{
 				TCODConsole::root->setDefaultForeground(TCODColor::lighterOrange);
 			}
-			else {
+			else
+			{
 				TCODConsole::root->setDefaultForeground(TCODColor::lightGrey);
 			}
 			TCODConsole::root->print(menux, menuy + currentItem * 3, (*it)->label);

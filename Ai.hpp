@@ -1,17 +1,15 @@
-class Ai : public Persistent
-{
+class Ai : public Persistent {
 public:
 	virtual void update(Actor *owner) = 0;
 	static Ai *create(TCODZip &zip);
 protected:
 	enum AiType
 	{
-		MONSTER, PLAYER, CONFUSED_MONSTER
+		MONSTER, CONFUSED_MONSTER, PLAYER
 	};
 };
 
-class MonsterAi : public Ai
-{
+class MonsterAi : public Ai {
 public:
 	MonsterAi();
 	void update(Actor *owner);
@@ -19,11 +17,11 @@ public:
 	void save(TCODZip &zip);
 protected:
 	int moveCount;
+
 	void moveOrAttack(Actor *owner, int targetx, int targety);
 };
 
-class PlayerAi : public Ai 
-{
+class PlayerAi : public Ai {
 public:
 	int xpLevel;
 	PlayerAi();
@@ -39,12 +37,12 @@ protected:
 
 class ConfusedMonsterAi : public Ai
 {
-public:
-	ConfusedMonsterAi(int nbTurns, Ai *oldAi);
-	void update(Actor *owner);
-	void load(TCODZip &zip);
-	void save(TCODZip &zip);
-protected:
-	int nbTurns;
-	Ai *oldAi;
+	public:
+		ConfusedMonsterAi(int nbTurns, Ai *oldAi);
+		void update(Actor *owner);
+		void load(TCODZip &zip);
+		void save(TCODZip &zip);
+		protected:
+		int nbTurns;
+		Ai *oldAi;
 };

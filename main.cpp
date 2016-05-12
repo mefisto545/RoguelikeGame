@@ -1,7 +1,7 @@
 #include "main.hpp"
 #pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
 
-Engine engine(80, 45); //DO NOT CHANGE!!!
+Engine engine(80, 45);
 
 int main()
 {
