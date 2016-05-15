@@ -248,7 +248,7 @@ void Map::addMonster(int x, int y)
 			// create an monster
 			Actor *orc = new Actor(x, y, 3860, "Крыса");
 			orc->destructible = new MonsterDestructible(5, 0, "Останки крысы", 30);
-			orc->attacker = new Attacker(1);
+			orc->attacker = new Attacker(1,0);
 			orc->ai = new MonsterAi();
 			engine.actors.push(orc);
 		}
@@ -257,7 +257,7 @@ void Map::addMonster(int x, int y)
 			// create another monster
 			Actor *troll = new Actor(x, y, 3894, "Вор");
 			troll->destructible = new MonsterDestructible(10, 0, "Труп", 40);
-			troll->attacker = new Attacker(2);
+			troll->attacker = new Attacker(2, 0);
 			troll->ai = new MonsterAi();
 			engine.actors.push(troll);
 		}
@@ -267,16 +267,16 @@ void Map::addMonster(int x, int y)
 			// create an monster
 			Actor *orc = new Actor(x, y, 3892, "Разбойник");
 			orc->destructible = new MonsterDestructible(10, 2, "Изуродованное тело", 50);
-			orc->attacker = new Attacker(3);
+			orc->attacker = new Attacker(3, 0);
 			orc->ai = new MonsterAi();
 			engine.actors.push(orc);
 		}
 		else
 		{
 			// create another monster
-			Actor *troll = new Actor(x, y, 0, "Сектант");
+			Actor *troll = new Actor(x, y, 3900, "Сектант");
 			troll->destructible = new MonsterDestructible(10, 0, "Останки сектанта", 40);
-			troll->attacker = new Attacker(5);
+			troll->attacker = new Attacker(5, 0);
 			troll->ai = new MonsterAi();
 			engine.actors.push(troll);
 		}
@@ -286,7 +286,7 @@ void Map::addMonster(int x, int y)
 			// create an monster
 			Actor *orc = new Actor(x, y, 3858, "Злобный орк");
 			orc->destructible = new MonsterDestructible(10, 0, "труп орка", 40);
-			orc->attacker = new Attacker(3);
+			orc->attacker = new Attacker(3, 0);
 			orc->ai = new MonsterAi();
 			engine.actors.push(orc);
 		}
@@ -294,8 +294,8 @@ void Map::addMonster(int x, int y)
 		{
 			// create another monster
 			Actor *troll = new Actor(x, y, 3866, "Толстый тролль");
-			troll->destructible = new MonsterDestructible(30, 0, "останки тролля", 60);
-			troll->attacker = new Attacker(5);
+			troll->destructible = new MonsterDestructible(30, 0, "Останки тролля", 60);
+			troll->attacker = new Attacker(5, 0);
 			troll->ai = new MonsterAi();
 			engine.actors.push(troll);
 		}
@@ -305,16 +305,16 @@ void Map::addMonster(int x, int y)
 			// create an monster
 			Actor *orc = new Actor(x, y, 3890, "Зомби");
 			orc->destructible = new MonsterDestructible(20, 1, "Павший зомби", 55);
-			orc->attacker = new Attacker(5);
+			orc->attacker = new Attacker(5, 0);
 			orc->ai = new MonsterAi();
 			engine.actors.push(orc);
 		}
 		else
 		{
 			// create another monster
-			Actor *troll = new Actor(x, y, 3866, "Гигантский паук");//
-			troll->destructible = new MonsterDestructible(50, 0, "Гигантский труп", 100);
-			troll->attacker = new Attacker(4);
+			Actor *troll = new Actor(x, y, 3902, "Гигантский паук");//
+			troll->destructible = new MonsterDestructible(50, 0, "Тело паука", 100);
+			troll->attacker = new Attacker(4, 0);
 			troll->ai = new MonsterAi();
 			engine.actors.push(troll);
 		}
@@ -323,17 +323,17 @@ void Map::addMonster(int x, int y)
 		if (rng->getInt(0, 100) < 50) {
 			// create an monster
 			Actor *orc = new Actor(x, y, 3888, "Скелет");//
-			orc->destructible = new MonsterDestructible(10, 0, "косточки", 60);
-			orc->attacker = new Attacker(6);
+			orc->destructible = new MonsterDestructible(10, 0, "Кости", 60);
+			orc->attacker = new Attacker(6, 0);
 			orc->ai = new MonsterAi();
 			engine.actors.push(orc);
 		}
 		else
 		{
 			// create another monster
-			Actor *troll = new Actor(x, y, 3866, "Прислужник нежити");//
-			troll->destructible = new MonsterDestructible(20, 1, "труп прислужника", 70);
-			troll->attacker = new Attacker(4);
+			Actor *troll = new Actor(x, y, 3930, "Бес");//
+			troll->destructible = new MonsterDestructible(20, 1, "Труп беса", 70);
+			troll->attacker = new Attacker(4, 0);
 			troll->ai = new MonsterAi();
 			engine.actors.push(troll);
 		}
@@ -342,17 +342,17 @@ void Map::addMonster(int x, int y)
 		if (rng->getInt(0, 100) < 50) {
 			// create an monster
 			Actor *orc = new Actor(x, y, 3864, "Скелет-боец");
-			orc->destructible = new MonsterDestructible(15, 5, "косточки", 100);
-			orc->attacker = new Attacker(10);
+			orc->destructible = new MonsterDestructible(15, 5, "Кости", 100);
+			orc->attacker = new Attacker(10, 0);
 			orc->ai = new MonsterAi();
 			engine.actors.push(orc);
 		}
 		else
 		{
 			// create another monster
-			Actor *troll = new Actor(x, y, 3866, "Нежить");//
-			troll->destructible = new MonsterDestructible(60, 0, "мерзость", 120);
-			troll->attacker = new Attacker(6);
+			Actor *troll = new Actor(x, y, 3954, "Минотавр");//
+			troll->destructible = new MonsterDestructible(60, 0, "Останки минотавра", 120);
+			troll->attacker = new Attacker(6, 0);
 			troll->ai = new MonsterAi();
 			engine.actors.push(troll);
 		}
@@ -360,18 +360,18 @@ void Map::addMonster(int x, int y)
 	case 7:
 		if (rng->getInt(0, 100) < 20) {
 			// create an monster
-			Actor *orc = new Actor(x, y, 3858, "Продвинутая нежить");//
-			orc->destructible = new MonsterDestructible(90, 1, "почетный труп", 150);
-			orc->attacker = new Attacker(8);
+			Actor *orc = new Actor(x, y, 3932, "Циклоп");//
+			orc->destructible = new MonsterDestructible(90, 1, "Тело циклопа", 150);
+			orc->attacker = new Attacker(8, 0);
 			orc->ai = new MonsterAi();
 			engine.actors.push(orc);
 		}
 		else
 		{
 			// create another monster
-			Actor *troll = new Actor(x, y, 3866, "Голем");//
-			troll->destructible = new MonsterDestructible(30, 5, "обломки голема", 30);
-			troll->attacker = new Attacker(3);
+			Actor *troll = new Actor(x, y, 3920, "Голем");//
+			troll->destructible = new MonsterDestructible(30, 5, "Обломки голема", 30);
+			troll->attacker = new Attacker(3, 0);
 			troll->ai = new MonsterAi();
 			engine.actors.push(troll);
 		}
@@ -379,18 +379,18 @@ void Map::addMonster(int x, int y)
 	case 8:
 		if (rng->getInt(0, 100) < 50) {
 			// create an monster
-			Actor *orc = new Actor(x, y, 3858, "Черт");//
-			orc->destructible = new MonsterDestructible(15, 0, "труп", 50);
-			orc->attacker = new Attacker(6);
+			Actor *orc = new Actor(x, y, 3922, "Чёрт");//
+			orc->destructible = new MonsterDestructible(15, 0, "Тело чёрта", 50);
+			orc->attacker = new Attacker(6, 0);
 			orc->ai = new MonsterAi();
 			engine.actors.push(orc);
 		}
 		else
 		{
 			// create another monster
-			Actor *troll = new Actor(x, y, 3866, "Цербер");//
-			troll->destructible = new MonsterDestructible(32, 5, "собачатина", 200);
-			troll->attacker = new Attacker(12);
+			Actor *troll = new Actor(x, y, 3924, "Цербер");//
+			troll->destructible = new MonsterDestructible(32, 5, "Тело цербера", 200);
+			troll->attacker = new Attacker(12, 0);
 			troll->ai = new MonsterAi();
 			engine.actors.push(troll);
 		}
@@ -398,18 +398,18 @@ void Map::addMonster(int x, int y)
 	case 9:
 		if (rng->getInt(0, 100) < 85) {
 			// create an monster
-			Actor *orc = new Actor(x, y, 3858, "адский гвардеец");//
-			orc->destructible = new MonsterDestructible(150, 10, "почетные останки", 400);
-			orc->attacker = new Attacker(20);
+			Actor *orc = new Actor(x, y, 3928, "Адский гвардеец");//
+			orc->destructible = new MonsterDestructible(150, 10, "Тело гвардейца", 400);
+			orc->attacker = new Attacker(20, 0);
 			orc->ai = new MonsterAi();
 			engine.actors.push(orc);
 		}
 		else
 		{
 			// create another monster
-			Actor *troll = new Actor(x, y, 3866, "Злобоглаз");//
-			troll->destructible = new MonsterDestructible(50, 0, "собачатина", 100);
-			troll->attacker = new Attacker(8);
+			Actor *troll = new Actor(x, y, 3926, "Злобоглаз");//
+			troll->destructible = new MonsterDestructible(50, 0, "Останки злобоглаза", 100);
+			troll->attacker = new Attacker(8, 0);
 			troll->ai = new MonsterAi();
 			engine.actors.push(troll);
 		}
@@ -417,18 +417,18 @@ void Map::addMonster(int x, int y)
 	default:
 		if (rng->getInt(0, 100) < 85) {
 			// create an monster
-			Actor *orc = new Actor(x, y, 3858, "адский гвардеец");//
-			orc->destructible = new MonsterDestructible(150, 10, "почетные останки", 400);
-			orc->attacker = new Attacker(20);
+			Actor *orc = new Actor(x, y, 3928, "Адский гвардеец");//
+			orc->destructible = new MonsterDestructible(150, 10, "Тело гвардейца", 400);
+			orc->attacker = new Attacker(20, 0);
 			orc->ai = new MonsterAi();
 			engine.actors.push(orc);
 		}
 		else
 		{
 			// create another monster
-			Actor *troll = new Actor(x, y, 3866, "Злобоглаз");//
-			troll->destructible = new MonsterDestructible(50, 0, "Останки", 100);
-			troll->attacker = new Attacker(8);
+			Actor *troll = new Actor(x, y, 3926, "Злобоглаз");//
+			troll->destructible = new MonsterDestructible(50, 0, "Останки злобоглаза", 100);
+			troll->attacker = new Attacker(8, 0);
 			troll->ai = new MonsterAi();
 			engine.actors.push(troll);
 		}

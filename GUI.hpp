@@ -12,7 +12,8 @@ public:
 		EXIT,
 		CONSTITUTION,
 		STRENGTH,
-		AGILITY
+		AGILITY,
+		INTELLIGENCE
 	};
 	enum DisplayMode
 	{

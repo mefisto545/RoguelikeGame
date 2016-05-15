@@ -90,7 +90,7 @@ void Actor::load(TCODZip &zip) {
 	bool hasContainer = zip.getInt();
 
 	if (hasAttacker) {
-		attacker = new Attacker(0.0f);
+		attacker = new Attacker(0.0f, 0.0f);
 		attacker->load(zip);
 	}
 

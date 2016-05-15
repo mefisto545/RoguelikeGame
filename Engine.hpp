@@ -15,6 +15,7 @@ public:
 	Actor *player;
 	Actor *stairs;
 	Actor *scroll;
+	Actor *parnak;
 	Map *map;
 	int fovRadius;
 	int screenWidth;

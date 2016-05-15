@@ -119,7 +119,8 @@ void PlayerAi::update(Actor *owner)
 		engine.gui->menu.clear();
 		engine.gui->menu.addItem(Menu::CONSTITUTION, "Телосложение (+20 Ед.зд)");
 		engine.gui->menu.addItem(Menu::STRENGTH, "Сила (+1 урон)");
-		engine.gui->menu.addItem(Menu::AGILITY, "Agility (+1 защита)");
+		engine.gui->menu.addItem(Menu::AGILITY, "Ловкость (+1 защита)");
+		engine.gui->menu.addItem(Menu::INTELLIGENCE, "Интеллект (усиление заклинаний)");
 		Menu::MenuItemCode menuItem = engine.gui->menu.pick(Menu::PAUSE);
 		switch (menuItem)
 		{
@@ -133,6 +134,8 @@ void PlayerAi::update(Actor *owner)
 		case Menu::AGILITY:
 			owner->destructible->defense += 1;
 			break;
+		case Menu::INTELLIGENCE:
+			owner->attacker->intell += 1;
 		default:break;
 		}
 	}
@@ -258,9 +261,9 @@ void PlayerAi::handleActionKey(Actor *owner, int ascii)
 			con.setDefaultForeground(TCODColor(200, 180, 50));
 			con.printFramenew(0, 0, INVENTORY_WIDTH, INVENTORY_HEIGHT, true, TCOD_BKGND_DEFAULT, "Письмо");
 			if (engine.level == 1)
-				con.print(3, 3, "Из записок капитана стражи:\n...на днях лазутчики доложили,\n что в этом древнем подземелье\n были обнаружены	загадочные \nсущества...");
+				con.print(3, 3, " И снова в эту треклятую деревню... На этот\nраз у них пропал священник. Хорошо, что нашли\nследы, ведущие к пещере.\n Вчера отправили туда отряд. Вернулся только\nодин, и тот говорить не хочет ничего. Всё-таки\nнадо разобраться, почему пропадают люди,\nведь не могут это быть простые разбойники, раз\nсамые крепкие погибли...");
 			else
-				con.print(3, 3, "Проклятье! Я не смогу их долго сдерживать.\nЕсли бы я мог добраться до кристалла\n и закрыть Врата! Но <DemonName> слишком\n силён для меня, а остальные члены экспедиции погибли,\nлибо лишились рассудка под влиянием\n демонов... ");
+				con.print(3, 3, "Проклятье! Я не смогу их долго сдерживать.\nЕсли бы я мог добраться до кристалла\n и закрыть Врата! Но Парнак слишком\n силён для меня, а остальные члены экспедиции погибли,\nлибо лишились рассудка под влиянием\n демонов... ");
 			TCODConsole::blit(&con, 0, 0, INVENTORY_WIDTH, INVENTORY_HEIGHT, TCODConsole::root, engine.screenWidth / 2 - INVENTORY_WIDTH / 2,
 				engine.screenHeight / 2 - INVENTORY_HEIGHT / 2);
 			TCODConsole::flush();

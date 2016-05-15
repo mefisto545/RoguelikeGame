@@ -5,7 +5,7 @@ Engine::Engine(int screenWidth, int screenHeight) : gameStatus(STARTUP), player(
 screenWidth(screenWidth), screenHeight(screenHeight), level(1)
 {
 	TCODConsole::setCustomFont("BigMainFont.png", TCOD_FONT_LAYOUT_ASCII_INROW | TCOD_FONT_TYPE_GREYSCALE, 16, 256);
-	TCODConsole::initRoot(screenWidth, screenHeight, "Test window", false);
+	TCODConsole::initRoot(screenWidth, screenHeight, "Test window", true);
 	TCODMouse::showCursor(true);
 	gui = new Gui();
 }
@@ -13,8 +13,8 @@ screenWidth(screenWidth), screenHeight(screenHeight), level(1)
 void Engine::init()
 {
 	player = new Actor(0, 0, 3856, "Игрок");
-	player->destructible = new PlayerDestructible(1000, 2, "Твои останки"); //heal and armor
-	player->attacker = new Attacker(5);
+	player->destructible = new PlayerDestructible(30, 1000, "Твои останки"); //heal and armor
+	player->attacker = new Attacker(1000, 1);
 	player->ai = new PlayerAi();
 	player->container = new Container(26);
 	actors.push(player);
@@ -93,7 +93,6 @@ void Engine::render()
 	player->render(-player->x + screenWidth / 2, -player->y + screenHeight / 2);
 	// show the player's stats
 	gui->render(player->x - screenWidth / 2, player->y - screenHeight / 2);
-	TCODConsole::root->print(0, screenHeight - 3, "mX=%d mY=%d", mouse.cx, mouse.cy);
 }
 
 void Engine::sendToBack(Actor *actor)
@@ -186,7 +185,7 @@ void Engine::nextLevel()
 		}
 	}
 	// create a new map
-	if (level != 2)
+	if (level < 10)
 	{
 		map = new Map(100, 100);
 		map->init(true);
@@ -199,14 +198,14 @@ void Engine::nextLevel()
 		for (int tilex = 0; tilex < 100; tilex++) //tile in the middle room
 			for (int tiley = 0; tiley < 160; tiley++)
 				map->map->setProperties(tilex, tiley, false, false);
-		map->dig(10, 8, 54, 8); //the highest space
-		map->dig(2, 6, 60, 24); // space with boss
-		map->dig(10, 24, 52, 48); // the middle room
-		map->dig(19, 48, 21, 50);// the corridor
-		map->dig(16, 50, 46, 60); //the last room
-		for (int tilex = 28; tilex <= 46; tilex += 2) //tile in the middle room
+		map->dig(10, 7, 54, 7); //the highest space
+		map->dig(2, 7, 60, 25); // space with boss
+		map->dig(10, 25, 52, 49); // the middle room
+		map->dig(19, 49, 21, 51);// the corridor
+		map->dig(16, 51, 46, 61); //the last room
+		for (int tilex = 14; tilex <= 48; tilex += 2) //tile in the middle room
 		{
-			for (int tiley = 30; tiley <= 32; tiley += 2)
+			for (int tiley = 29; tiley <= 31; tiley += 2)
 			{
 				map->map->setProperties(tilex, tiley, false, false);
 				map->map->setProperties(tilex + 1, tiley, false, false);
@@ -214,7 +213,86 @@ void Engine::nextLevel()
 				map->map->setProperties(tilex + 1, tiley - 1, false, false);
 			}
 		}
+
+		for (int tilex = 24; tilex <= 26; tilex += 2) //tile near the boss (left up)
+		{
+			for (int tiley = 13; tiley <= 15; tiley += 2)
+			{
+				map->map->setProperties(tilex, tiley, false, false);
+				map->map->setProperties(tilex + 1, tiley, false, false);
+				map->map->setProperties(tilex, tiley - 1, false, false);
+				map->map->setProperties(tilex + 1, tiley - 1, false, false);
+			}
+		}
+
+		for (int tilex = 24; tilex <= 26; tilex += 1) //tile near the boss (left dow)
+		{
+			for (int tiley = 21; tiley <= 23; tiley += 2)
+			{
+				map->map->setProperties(tilex, tiley, false, false);
+				map->map->setProperties(tilex + 1, tiley, false, false);
+				map->map->setProperties(tilex, tiley - 1, false, false);
+				map->map->setProperties(tilex + 1, tiley - 1, false, false);
+			}
+		}
+
+		for (int tilex = 36; tilex <= 38; tilex += 1) //tile near the boss (right up)
+		{
+			for (int tiley = 13; tiley <= 15; tiley += 2)
+			{
+				map->map->setProperties(tilex, tiley, false, false);
+				map->map->setProperties(tilex + 1, tiley, false, false);
+				map->map->setProperties(tilex, tiley - 1, false, false);
+				map->map->setProperties(tilex + 1, tiley - 1, false, false);
+			}
+		}
+
+		for (int tilex = 36; tilex <= 38; tilex += 2) //tile near the boss (right dow)
+		{
+			for (int tiley = 21; tiley <= 23; tiley += 2)
+			{
+				map->map->setProperties(tilex, tiley, false, false);
+				map->map->setProperties(tilex + 1, tiley, false, false);
+				map->map->setProperties(tilex, tiley - 1, false, false);
+				map->map->setProperties(tilex + 1, tiley - 1, false, false);
+			}
+		}
+		Actor *guard1 = new Actor(14, 46, 3928, "Адский гвардеец");
+		guard1->destructible = new MonsterDestructible(150, 10, "Тело гвардейца", 400);
+		guard1->attacker = new Attacker(20,0);
+		guard1->ai = new MonsterAi();
+		engine.actors.push(guard1);
+
+		Actor *guard2 = new Actor(48, 46, 3928, "Адский гвардеец");
+		guard2->destructible = new MonsterDestructible(150, 10, "Тело гвардейца", 400);
+		guard2->attacker = new Attacker(20,0);
+		guard2->ai = new MonsterAi();
+		engine.actors.push(guard2);
+
+		Actor *warsceleton1 = new Actor(12, 24, 3864, "Скелет-боец");
+		warsceleton1->destructible = new MonsterDestructible(15, 5, "Кости", 100);
+		warsceleton1->attacker = new Attacker(10,0);
+		warsceleton1->ai = new MonsterAi();
+		engine.actors.push(warsceleton1);
+
+		Actor *warsceleton2 = new Actor(46, 24, 3864, "Скелет-боец");
+		warsceleton2->destructible = new MonsterDestructible(15, 5, "Кости", 100);
+		warsceleton2->attacker = new Attacker(10,0);
+		warsceleton2->ai = new MonsterAi();
+		engine.actors.push(warsceleton2);
+
+		parnak = new Actor(18, 18, 3930, "Парнак");
+		parnak->destructible = new MonsterDestructible(500, 5, "Тело демона", 5000);
+		parnak->attacker = new Attacker(25,0);
+		parnak->ai = new MonsterAi();
+		engine.actors.push(parnak);
+
+		stairs->x = 0;
+		stairs->y = 0;
+		player->x = 36;
+		player->y = 56;
 		engine.scroll->x = player->x + 2;
 		engine.scroll->y = player->y + 2;
+		gameStatus = STARTUP;
 	}
 }

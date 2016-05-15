@@ -22,7 +22,7 @@ void Gui::render(int cx, int cy)
 	PlayerAi *ai = (PlayerAi *)engine.player->ai;
 	char xpTxt[128];
 	sprintf(xpTxt, "Опыт(%d)", ai->xpLevel);
-	renderBar(1, 5, BAR_WIDTH, xpTxt, engine.player->destructible->xp, ai->getNextLevelXp(), TCODColor::lightViolet, TCODColor::darkerViolet);
+	renderBar(1, 2, BAR_WIDTH, xpTxt, engine.player->destructible->xp, ai->getNextLevelXp(), TCODColor::lightViolet, TCODColor::darkerViolet);
 	// mouse look
 	renderMouseLook(cx, cy);
 	// draw the message log
@@ -175,7 +175,7 @@ void Menu::putBigPic()
 				TCODConsole::root->putChar(i+16*k, j, 256+i+j*16+720*k);
 }
 
-const int PAUSE_MENU_WIDTH = 30;
+const int PAUSE_MENU_WIDTH = 40;
 const int PAUSE_MENU_HEIGHT = 15;
 
 Menu::MenuItemCode Menu::pick(DisplayMode mode)

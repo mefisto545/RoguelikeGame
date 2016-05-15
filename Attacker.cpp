@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "main.hpp"
 
-Attacker::Attacker(float power) : power(power){}
+Attacker::Attacker(float power, float intell) : power(power), intell(intell) {}
 
 void Attacker::attack(Actor *owner, Actor *target) 
 {
